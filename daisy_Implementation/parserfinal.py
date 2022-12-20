@@ -1,6 +1,8 @@
 # import sys
 import copy
+import time
 # sys.setrecursionlimit(1500)
+# - * - Coding: UTF-8 - * - 
 
 def predictor(sequence,dot,grammarset,ori,renew_state):
     newsequence = []
@@ -25,16 +27,15 @@ def predictor(sequence,dot,grammarset,ori,renew_state):
                         idx += 1
                     if idx == (len(grammar)):
                         break
-
-            if ori == 0:
-                minnewsequence.append(sequence[-3] + 1)
-                minnewsequence.append(sequence[-3] + 1)
-            else:
-                minnewsequence.append(sequence[-3])
-                minnewsequence.append(sequence[-3])
-            # minnewsequence.append(0)
-            minnewsequence.append(1)
-            newsequence.append(minnewsequence)
+                if ori == 0:
+                    minnewsequence.append(sequence[-3] + 1)
+                    minnewsequence.append(sequence[-3] + 1)
+                else:
+                    minnewsequence.append(sequence[-3])
+                    minnewsequence.append(sequence[-3])
+                # minnewsequence.append(0)
+                minnewsequence.append(1)
+                newsequence.append(minnewsequence)
     return newsequence,renew_state
 
 def scanner(sequence,dot,state,curr_state):
@@ -57,7 +58,14 @@ def scanner(sequence,dot,state,curr_state):
 
 def parser(sequence,dot,curr_state,state,grammarset,flag,traversed_flag,word,renew_state):
     if traversed_flag == len(word):
-        state[-2].append(state[1][0])
+        if dot == (len(sequence[0:-3])):
+            for i in range(len(state[-2])):
+                if state[-2][i] == sequence:
+                    cur = i
+            state[-2][cur-1][-1] = state[-2][cur-1][-1] + 1
+        n = copy.deepcopy(state[0][0])
+        n[-1] = n[-1] + 1
+        state[-2].append(n)
         return state[:-1]
     if dot == (len(sequence[0:-3])): #COMPLETER RULE
         if len(state[-1]) == 0:
@@ -115,8 +123,6 @@ def main():
     sequence.append(dot)
 
     grammarset = []
-    # grammarset.append("BSTa")
-    # grammarset.append("STc")
     grammarset.append("SSS")
     grammarset.append("STa")
     curr_state = []
@@ -156,7 +162,7 @@ def main():
     j = 0
     dot = 1
     flag = 0
-    word = "nn"
+    word = "n"*2
     traversed_flag = 0
     sequence.append("S'")
     sequence.append("E")
@@ -175,7 +181,63 @@ def main():
     renew_state = 0
     
     result = []
+    st = time.time()
     result = parser(sequence,dot,curr_state,state,grammarset,flag,traversed_flag,word,renew_state)
+    et = time.time()
+    for i in range(len(result)):
+        print("S",i,": ",end="")
+        for j in range(len(result[i])):
+            print("[",end="")
+            for z in range(len(result[i][j]) - 2):
+                dot_posi = result[i][j][-1] 
+                if z == 0:
+                    print(result[i][j][0],"->",end="")
+                elif z > 0 and z < dot_posi:
+                    print(result[i][j][z],end="")
+                elif z == dot_posi:
+                    print(".",end="")
+                    if dot_posi != (len(result[i][j]) - 3):
+                        print(result[i][j][z],end="")
+                else:
+                    if z != len(result[i][j]) - 3:
+                        print(result[i][j][z],end="")
+            print(" ,",result[i][j][-2],end="")
+            print("], ",end="")
+        print("\n")
+    print("Time:",(et-st)*1000,"miliseconds")
+
+    print("---------------------------------------------------------------------------------")
+    print("CHINESE EXAMPLE")
+    sequence = []
+    state = [[]]
+    j = 0
+    dot = 1
+    flag = 0
+    word = "我叫D"
+    print("Parsing word:",word)
+    traversed_flag = 0
+    sequence.append("S'")
+    sequence.append("S")
+    sequence.append(0)
+    sequence.append(j)
+    sequence.append(dot)
+
+    grammarset = []
+    grammarset.append("SPVN")
+    grammarset.append("PT我")
+    grammarset.append("VT叫")
+    grammarset.append("NTD")
+    curr_state = []
+    curr_state.append(sequence)
+
+    state[-1].append(sequence)
+
+    renew_state = 0
+    
+    result = []
+    st = time.time()
+    result = parser(sequence,dot,curr_state,state,grammarset,flag,traversed_flag,word,renew_state)
+    et = time.time()
     for i in range(len(result)):
         print("S",i,": ",end="")
         for j in range(len(result[i])):
@@ -197,7 +259,8 @@ def main():
             print("], ",end="")
         print("\n")
 
-            
+    print("Time:",(et-st)*1000,"miliseconds")
+
 
 if __name__ == "__main__":
     main()
