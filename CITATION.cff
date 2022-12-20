@@ -1,7 +1,6 @@
 
 @software{protoTypeEarleyParser,
   author = {Daisy Huynh,Raiyan Reza},
-  doi = {10.5281/zenodo.1234},
   month = {12},
   title = {{Earley Parser Prototype}},
   url = {https://github.com/srr408/earleyParserProtoype.git},
